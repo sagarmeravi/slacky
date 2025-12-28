@@ -1,8 +1,8 @@
 import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
 import { User } from "../models/user.model.js";
-// import { deleteStreamUser } from "../services/stream.js"; // adjust path as needed
-// Create a client to send and receive events
+import { upsertStreamUser, deleteStreamUser } from "./stream.js";
+import { StreamChat } from "stream-chat";
 export const inngest = new Inngest({ id: "slacky" });
 connectDB();
 export const syncUser = inngest.createFunction(
@@ -18,16 +18,25 @@ export const syncUser = inngest.createFunction(
       image: image_url,
     };
     await User.create(newUser);
-    //todo
+
+    await upsertStreamUser({
+      id: newUser.clerkId.toString(),
+      name: newUser.name,
+      image: newUser.image,
+    });
   }
 );
+
 export const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db" },
   { event: "clerk/user.deleted" },
   async ({ event }) => {
     const { id } = event.data;
     await User.deleteOne({ clerkId: id });
-    //todo task
+    await deleteStreamUser(id.toString());
   }
 );
+
+
+
 export const functions = [syncUser, deleteUserFromDB];
