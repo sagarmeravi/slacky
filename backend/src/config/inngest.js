@@ -1,36 +1,33 @@
 import { Inngest } from "inngest";
 import { connectDB } from "./db.js";
+import { User } from "../models/user.model.js";
+// import { deleteStreamUser } from "../services/stream.js"; // adjust path as needed
 // Create a client to send and receive events
 export const inngest = new Inngest({ id: "slacky" });
-
-const syncUser = inngest.createFunction(
+connectDB();
+export const syncUser = inngest.createFunction(
   { id: "sync-user" },
-  { event: "clerk/user.creation" },
+  { event: "clerk/user.created" },
   async ({ event }) => {
-    await connectDB();
-
     const { id, email_addresses, first_name, last_name, image_url } =
-      event.data; // Contains the Clerk user data
+      event.data;
     const newUser = {
       clerkId: id,
-      email: email_addresses[0]?.email_address,
+      email: primaryEmail,
       name: `${first_name || ""} ${last_name || ""}`,
-      imageUrl: image_url,
+      image_url: image_url,
     };
     await User.create(newUser);
-    //todo: etc.
+    //todo
   }
 );
-const deleteUserFromDB = inngest.createFunction(
+export const deleteUserFromDB = inngest.createFunction(
   { id: "delete-user-from-db" },
   { event: "clerk/user.deleted" },
   async ({ event }) => {
-    await connectDB();
     const { id } = event.data;
     await User.deleteOne({ clerkId: id });
-    await deleteStreamUser(id.toString());
-    //todo etc
+    //todo task
   }
 );
-// Create an empty array where we'll export future Inngest functions
 export const functions = [syncUser, deleteUserFromDB];
