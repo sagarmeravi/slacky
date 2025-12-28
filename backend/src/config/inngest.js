@@ -13,9 +13,9 @@ export const syncUser = inngest.createFunction(
       event.data;
     const newUser = {
       clerkId: id,
-      email: primaryEmail,
+      email: email_addresses[0]?.email_address,
       name: `${first_name || ""} ${last_name || ""}`,
-      image_url: image_url,
+      image: image_url,
     };
     await User.create(newUser);
     //todo
