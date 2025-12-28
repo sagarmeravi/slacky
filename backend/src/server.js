@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import { ENV } from "./config/env.js";
+import { connectDB } from "./config/db.js";
 const app = express();
 
 app.get("/", (req, res) => {
@@ -10,4 +11,5 @@ app.get("/", (req, res) => {
 
 app.listen(ENV.PORT, () => {
   console.log("server is started at ", ENV.PORT);
+  connectDB();
 });
