@@ -4,8 +4,8 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS='--import ./instrument.mjs' nodemon src/server.js",
-    "start": "NODE_OPTIONS='--import ./instrument.mjs' node src/server.js"
+    "dev": "cross-env NODE_OPTIONS=--import=./instrument.mjs nodemon src/server.js",
+    "start": "cross-env NODE_OPTIONS=--import=./instrument.mjs node src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +20,8 @@
     "inngest": "^3.40.1",
     "mongoose": "^8.16.5",
     "stream-chat": "^8.60.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.1.0"
   }
 }
