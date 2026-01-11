@@ -3,22 +3,21 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { ClerkProvider } from "@clerk/clerk-react";
-import { BrowserRouter } from "react-router";
-import { Toaster } from "react-hot-toast";
 import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
-import AuthProvider from "./providers/AuthProvider.jsx";
-import {
-  createBrowserRouter,
-  createRoutesFromChildren,
-  matchRoutes,
+  Routes,
+  Route,
+  BrowserRouter,
   useLocation,
   useNavigationType,
+  createRoutesFromChildren,
+  matchRoutes,
 } from "react-router";
+import { Toaster } from "react-hot-toast";
+
 import * as Sentry from "@sentry/react";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import AuthProvider from "./providers/AuthProvider.jsx";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +29,7 @@ if (!PUBLISHABLE_KEY) {
 }
 
 Sentry.init({
-  dsn: "https://efab06094e07ee64dd85fa77d2cd10f2@o4509194884808704.ingest.us.sentry.io/4510633774415872",
+  dsn: "https://572f20896a9cdbf9c28b2c1cf09f3884@o4509813037137920.ingest.de.sentry.io/4509829667487824",
   integrations: [
     Sentry.reactRouterV7BrowserTracingIntegration({
       useEffect: React.useEffect,

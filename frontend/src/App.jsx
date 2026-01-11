@@ -1,20 +1,19 @@
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  useAuth,
-  UserButton,
-} from "@clerk/clerk-react";
-import { Routes, Route, Navigate } from "react-router";
-import HomePage from "./pages/HomePage";
+import { useAuth } from "@clerk/clerk-react";
+import { Navigate, Route, Routes } from "react-router";
+
 import AuthPage from "./pages/AuthPage";
+import CallPage from "./pages/CallPage";
+import HomePage from "./pages/HomePage";
+
 import * as Sentry from "@sentry/react";
-import CallPage from "./pages/CallPage.jsx";
 
 const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 
 const App = () => {
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) return null;
+
   return (
     <SentryRoutes>
       <Route
@@ -44,4 +43,5 @@ const App = () => {
     </SentryRoutes>
   );
 };
+
 export default App;

@@ -1,47 +1,42 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
-import { ENV } from "./config/env.js";
-import { clerkMiddleware } from "@clerk/express";
-import { connectDB } from "./config/db.js";
-import { functions, inngest } from "./config/inngest.js";
-import { serve } from "inngest/express";
-import chatRoutes from "./routes/chat.route.js";
-import "../instrument.mjs";
-import * as Sentry from "@sentry/node";
+import { StreamChat } from "stream-chat";
+
 const app = express();
 
 app.use(express.json());
-app.use(clerkMiddleware()); //req.auth will be
+app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 
-app.get("/debug-sentry", (req, res) => {
-  throw new Error("Sentry error test!");
-});
+const STREAM_API_KEY = process.env.STREAM_API_KEY;
+const STREAM_API_SECRET = process.env.STREAM_API_SECRET;
+
+const streamClient =
+  STREAM_API_KEY && STREAM_API_SECRET
+    ? StreamChat.getInstance(STREAM_API_KEY, STREAM_API_SECRET)
+    : null;
 
 app.get("/", (req, res) => {
-  res.send("Hello world! 123");
+  res.send("Hello world!");
 });
 
-app.use("/api/inngest", serve({ client: inngest, functions }));
-app.use("/api/chat", chatRoutes);
-
-Sentry.setupExpressErrorHandler(app);
-
-const startServer = async () => {
+app.get("/api/chat/token/stream", (req, res) => {
   try {
-    await connectDB();
-    if (ENV.NODE_ENV !== "production") {
-      app.listen(ENV.PORT, () => {
-        console.log("server is started at ", ENV.PORT);
-        connectDB();
-      });
+    if (!streamClient) {
+      return res.status(500).json({ error: "Stream not configured" });
     }
+
+    const userId = "test-user-" + Date.now();
+    const token = streamClient.createToken(userId);
+
+    res.json({ token });
   } catch (error) {
-    console.log("Error in starting server ", error);
-    process.exit(1);
+    console.error("Token generation error:", error);
+    res.status(500).json({ error: error.message });
   }
-};
+});
 
-startServer();
+const PORT = process.env.PORT || 5001;
 
-export default app;
+app.listen(PORT, () => {
+  console.log(`✅ Server running at http://localhost:${PORT}`);
+});
