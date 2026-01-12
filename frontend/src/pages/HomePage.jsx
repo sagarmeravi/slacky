@@ -36,8 +36,31 @@ const HomePage = () => {
     }
   }, [chatClient, searchParams]);
 
-  // todo: handle this with a better component
-  if (error) return <p>Something went wrong...</p>;
+  if (error) {
+    return (
+      <div
+        style={{
+          padding: "20px",
+          color: "red",
+          textAlign: "center",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <h2>❌ Error Loading Chat</h2>
+        <p>{error.message || "Failed to load chat. Check backend."}</p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{ padding: "10px 20px", marginTop: "10px" }}
+        >
+          Reload Page
+        </button>
+      </div>
+    );
+  }
   if (!chatClient) return <PageLoader />;
 
   return (
