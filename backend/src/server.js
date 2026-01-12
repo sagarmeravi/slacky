@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import { StreamChat } from "stream-chat";
+import { serve } from "inngest/express";
+import { inngest, functions } from "./config/inngest.js";
 
 const app = express();
 
@@ -34,6 +36,8 @@ app.get("/api/chat/token/stream", (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+app.use("/api/inngest", serve({ client: inngest, functions: functions }));
 
 const PORT = process.env.PORT || 5001;
 
